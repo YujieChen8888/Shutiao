@@ -4,6 +4,16 @@
 
 一只属于你的暹罗猫桌面伙伴。浅蓝眼睛、深咖啡重点色、暖米色身体，陪你打字、换装，也记得提醒你喝水。
 
+## 把链接发给 AI 安装
+
+可以让**能操作你本机终端的 AI 助手**直接从源码编译安装，无需等待 Releases 安装包，也无需 GitHub token、`workflow` 权限或付费 API。
+
+把下面这段话发给它：
+
+> 请帮我在这台电脑上安装陈薯条桌宠：https://github.com/YujieChen8888/Shutiao 。先阅读 README 和 docs/AI-INSTALL.md，识别我的系统与芯片架构，检查并安装所需依赖，从源码编译并启动。默认使用陈薯条角色，保留衣橱和日历提醒；已有安装和提醒数据请保留。最后确认桌宠显示、右键衣橱、日历和提醒测试都正常。
+
+**[AI 安装指南：macOS / Windows](docs/AI-INSTALL.md)** 包含依赖、命令、安装位置、验证和常见问题。首次安装编译工具需要下载和等待；系统授权或管理员提示可能需要你亲自操作。仅能聊天、不能使用本机工具的 AI 可以提供指导，但不能替你安装。
+
 ## 新增功能
 
 - **陈薯条专属角色**：参考真实照片，通过 KuroCat 内置 MCP 创建角色参数，再内置到 2D / 3D 渲染器。细调脸型、耳朵、眼睑、身体比例与重点色；英文名 **Shutiao Chen**。
@@ -28,10 +38,10 @@
 
 ## macOS / Windows
 
-- **macOS**：保留 Apple Silicon 与 Intel 支持，CI 构建通用版 `.dmg`。
-- **Windows 10 / 11 x64**：保留原生键鼠监听、透明置顶和托盘，CI 构建 NSIS `.exe` 安装包。
-- 两个平台共用衣橱、日历提醒与 MCP 功能；已在 macOS 本地构建，Windows 尚待 CI 或 Windows 机器验证。
-- [双平台构建配置](ci/github-actions/release.yml) 已准备好。当前 GitHub 凭证缺少 `workflow` 权限，配置暂存于 `ci/github-actions/`；补充权限后移到 `.github/workflows/release.yml` 即可启用。成功后可在 [Actions](https://github.com/YujieChen8888/Shutiao/actions) 的 Artifacts 下载。安装包为开源未公证/未商业签名版本。
+- **macOS**：保留 Apple Silicon 与 Intel 支持，可在本机编译 `.app`；已在 Apple Silicon Mac 验证。
+- **Windows 10 / 11 x64**：保留原生键鼠监听、透明置顶和托盘，可在本机编译 `.exe` 或 NSIS 安装包，尚待 Windows 实机验证。
+- 两个平台共用衣橱、日历提醒与 MCP 功能。直接安装使用上面的 AI 安装指南，不依赖 GitHub Actions。
+- [双平台构建配置](ci/github-actions/release.yml) 是可选的发布工具；维护者以后可将其移到 `.github/workflows/release.yml` 启用自动打包。自动打包需要的 GitHub 权限与使用者的本地安装无关。
 
 ## 本地开发与构建
 
@@ -77,4 +87,4 @@ macOS 仅生成应用：`npm run tauri -- build --bundles app`。产物位于 `s
 - Linux：`~/.config/shutiao-pet/`
 - `settings.json`：外观、装扮和窗口设置；`cats.json`：MCP 自定义角色；`reminders.json`：提醒任务与下次时间。
 
-本分支采用手动下载安装更新，避免原版自动更新覆盖二创内容。版本与安装包见 [Releases](https://github.com/YujieChen8888/Shutiao/releases)。保留上游历史，原版详细说明见 [上游项目](https://github.com/qianyiai/kurocat)。
+本分支采用手动更新。当前可从本仓库拉取新版本并按安装指南重新编译，保留数据目录；如后续发布预编译安装包，会列在 [Releases](https://github.com/YujieChen8888/Shutiao/releases)。保留上游历史，原版详细说明见 [上游项目](https://github.com/qianyiai/kurocat)。
