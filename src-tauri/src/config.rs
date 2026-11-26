@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 fn default_cat_breed() -> String {
-    "black".to_string()
+    "shutiao".to_string()
 }
 
 fn default_mcp_enabled() -> bool {
@@ -16,7 +16,7 @@ fn default_privacy_password_guard() -> bool {
 }
 
 fn default_mcp_port() -> u16 {
-    27420
+    27430
 }
 
 fn default_obs_enabled() -> bool {
@@ -24,7 +24,7 @@ fn default_obs_enabled() -> bool {
 }
 
 fn default_obs_port() -> u16 {
-    27421
+    27431
 }
 
 fn default_obs_hide_pet() -> bool {
@@ -81,7 +81,7 @@ pub fn normalize_fps_cap(raw: u16) -> u16 {
 }
 
 pub fn default_language() -> String {
-    "auto".to_string()
+    "zh-CN".to_string()
 }
 
 pub fn normalize_language(raw: &str) -> String {
@@ -161,6 +161,8 @@ pub fn normalize_tail_key_ids(raw: &[String]) -> Vec<String> {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AppSettings {
+    #[serde(default = "default_outfit")]
+    pub outfit_id: String,
     pub x: Option<i32>,
     pub y: Option<i32>,
     #[cfg(target_os = "macos")]
@@ -209,9 +211,19 @@ pub struct AppSettings {
     pub language: String,
 }
 
+pub fn default_outfit() -> String { "blue-collar".into() }
+
+pub fn normalize_outfit(raw: &str) -> String {
+    match raw {
+        "none" | "blue-collar" | "mint-vest" | "oat-knit" | "vampire" | "sailor" | "raincoat" | "festive" => raw.into(),
+        _ => default_outfit(),
+    }
+}
+
 impl Default for AppSettings {
     fn default() -> Self {
         Self {
+            outfit_id: default_outfit(),
             x: None,
             y: None,
             #[cfg(target_os = "macos")]
@@ -250,7 +262,7 @@ pub fn app_data_dir() -> PathBuf {
         let base = std::env::var("APPDATA")
             .map(PathBuf::from)
             .unwrap_or_else(|_| PathBuf::from("."));
-        base.join("kuro-cat-pet")
+        base.join("shutiao-pet")
     }
     #[cfg(target_os = "macos")]
     {
@@ -259,14 +271,14 @@ pub fn app_data_dir() -> PathBuf {
             .unwrap_or_else(|_| PathBuf::from("."));
         home.join("Library")
             .join("Application Support")
-            .join("kuro-cat-pet")
+            .join("shutiao-pet")
     }
     #[cfg(all(not(windows), not(target_os = "macos")))]
     {
         let home = std::env::var("HOME")
             .map(PathBuf::from)
             .unwrap_or_else(|_| PathBuf::from("."));
-        home.join(".config").join("kuro-cat-pet")
+        home.join(".config").join("shutiao-pet")
     }
 }
 
@@ -278,6 +290,7 @@ pub fn load_settings() -> AppSettings {
     let path = config_path();
     if let Ok(content) = fs::read_to_string(&path) {
         if let Ok(mut parsed) = serde_json::from_str::<AppSettings>(&content) {
+            parsed.outfit_id = normalize_outfit(&parsed.outfit_id);
             parsed.scale = parsed.scale.clamp(0.20, 1.50);
             parsed.tail_key_mode = normalize_tail_key_mode(&parsed.tail_key_mode);
             parsed.tail_key_ids = normalize_tail_key_ids(&parsed.tail_key_ids);
@@ -329,8 +342,8 @@ pub fn set_windows_autostart(enabled: bool) -> Result<(), String> {
     }
 
     let subkey = to_wide("Software\\Microsoft\\Windows\\CurrentVersion\\Run");
-    let value_name = to_wide("KuroCat");
-    let legacy_value_name = to_wide("KuroCatPet");
+    let value_name = to_wide("Shutiao");
+    let legacy_value_name = to_wide("ShutiaoPet");
 
     unsafe {
         let mut hkey: HKEY = std::ptr::null_mut();
@@ -383,7 +396,7 @@ pub fn set_windows_autostart(enabled: bool) -> Result<(), String> {
 pub fn set_windows_autostart(enabled: bool) -> Result<(), String> {
     let home = std::env::var("HOME").map_err(|e| e.to_string())?;
     let agents_dir = PathBuf::from(home).join("Library").join("LaunchAgents");
-    let plist_path = agents_dir.join("com.kurocat.pet.plist");
+    let plist_path = agents_dir.join("com.yujiechen.shutiao.plist");
 
     if enabled {
         fs::create_dir_all(&agents_dir).map_err(|e| e.to_string())?;
@@ -397,7 +410,7 @@ pub fn set_windows_autostart(enabled: bool) -> Result<(), String> {
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.kurocat.pet</string>
+    <string>com.yujiechen.shutiao</string>
     <key>ProgramArguments</key>
     <array>
         <string>{}</string>
@@ -429,7 +442,7 @@ pub fn set_windows_autostart(enabled: bool) -> Result<(), String> {
             PathBuf::from(home).join(".config")
         });
     let autostart_dir = config_root.join("autostart");
-    let desktop_path = autostart_dir.join("kurocat.desktop");
+    let desktop_path = autostart_dir.join("shutiao.desktop");
 
     if enabled {
         fs::create_dir_all(&autostart_dir).map_err(|e| e.to_string())?;
@@ -440,10 +453,10 @@ pub fn set_windows_autostart(enabled: bool) -> Result<(), String> {
         let entry = format!(
             "[Desktop Entry]\n\
              Type=Application\n\
-             Name=KuroCat\n\
+             Name=Shutiao\n\
              Comment=Minimalist desktop cat typing & mouse companion\n\
              Exec=\"{exe}\"\n\
-             Icon=KuroCat\n\
+             Icon=Shutiao\n\
              Terminal=false\n\
              X-GNOME-Autostart-enabled=true\n",
             exe = exe.replace('"', "\\\"")
@@ -473,7 +486,7 @@ pub fn create_desktop_shortcut() -> Result<String, String> {
 
     let script = format!(
         "$desktop = [Environment]::GetFolderPath('Desktop'); \
-         $lnk = Join-Path $desktop 'KuroCat.lnk'; \
+         $lnk = Join-Path $desktop 'Shutiao.lnk'; \
          $ws = New-Object -ComObject WScript.Shell; \
          $s = $ws.CreateShortcut($lnk); \
          $s.TargetPath = '{exe}'; \

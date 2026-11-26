@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "KuroCat",
-  "version": "5.1.2",
-  "identifier": "com.kurocat.pet",
+  "productName": "Shutiao",
+  "version": "5.2.0",
+  "identifier": "com.yujiechen.shutiao",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -15,7 +15,7 @@
     "windows": [
       {
         "label": "main",
-        "title": "KuroCat",
+        "title": "陈薯条 · Shutiao Chen",
         "width": 420,
         "height": 440,
         "resizable": false,
@@ -35,8 +35,8 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "publisher": "KuroCat",
-    "shortDescription": "Minimalist desktop cat typing & mouse companion",
+    "publisher": "YujieChen8888",
+    "shortDescription": "薯条桌宠 · 装扮与喝水提醒",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

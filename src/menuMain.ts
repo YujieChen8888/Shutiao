@@ -1,3 +1,5 @@
+import { OUTFITS } from './wardrobe';
+import { mountReminderMenu } from './reminderMenu';
 import './style.css';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
@@ -14,6 +16,7 @@ import {
 } from './i18n';
 
 interface AppSettings {
+  outfitId?: string;
   x: number | null;
   y: number | null;
   scale: number;
@@ -59,7 +62,7 @@ interface UpdateProgressEvent {
   info?: UpdateInfo | null;
 }
 
-type MenuTabId = 'appearance' | 'system';
+type MenuTabId = 'appearance' | 'system' | 'wardrobe' | 'reminders';
 
 let settings: AppSettings = {
   x: null,
@@ -70,16 +73,16 @@ let settings: AppSettings = {
   showKeyBubbles: true,
   soundEnabled: true,
   autostart: false,
-  catBreed: 'black',
+  catBreed: 'shutiao',
   mcpEnabled: true,
-  mcpPort: 27420,
+  mcpPort: 27430,
   keyboardLayout: '65',
   keyboardOrientation: 'cat',
   privacyPasswordGuard: true,
   tailKeyMode: 'smart',
   tailKeyIds: [...DEFAULT_TAIL_KEY_IDS],
   obsEnabled: false,
-  obsPort: 27421,
+  obsPort: 27431,
   obsHidePet: false,
   renderMode: '3d',
   collarColor: 'none',
@@ -122,7 +125,7 @@ function formatHeaderCatName(cat: CatSkinConfig): string {
     cat.emoji && displayName.startsWith(cat.emoji)
       ? displayName.slice(cat.emoji.length).trimStart()
       : displayName;
-  return `${emoji} KuroCat ${bareName}`;
+  return `${emoji} ${bareName} · Shutiao`;
 }
 
 function switchTab(nextTab: MenuTabId): void {
@@ -214,7 +217,7 @@ function syncUI(): void {
   }
   const obsHint = document.getElementById('obs-copy-hint');
   if (obsHint && !obsHint.classList.contains('copied')) {
-    obsHint.textContent = settings.obsEnabled ? `:${settings.obsPort || 27421}` : t('menu.obs_hint');
+    obsHint.textContent = settings.obsEnabled ? `:${settings.obsPort || 27431}` : t('menu.obs_hint');
   }
   const mcpHint = document.getElementById('mcp-copy-hint');
   if (mcpHint && !mcpHint.classList.contains('copied')) {
@@ -267,6 +270,10 @@ function syncUI(): void {
 
   const activeCat = catList.find((c) => c.id === settings.catBreed) ?? catList[0];
   renderBreedPills();
+  document.querySelectorAll<HTMLButtonElement>('[data-outfit]').forEach(btn => {
+    btn.classList.toggle('active',btn.dataset.outfit === (settings.outfitId ?? 'blue-collar'));
+    btn.setAttribute('aria-pressed',String(btn.dataset.outfit === (settings.outfitId ?? 'blue-collar')));
+  });
 
   const renderMode = settings.renderMode === '2d' ? '2d' : '3d';
   const collarColor =
@@ -392,7 +399,7 @@ async function copyObsUrl(): Promise<void> {
       hint.classList.add('copied');
       setTimeout(() => {
         hint.classList.remove('copied');
-        hint.textContent = settings.obsEnabled ? `:${settings.obsPort || 27421}` : t('menu.obs_hint');
+        hint.textContent = settings.obsEnabled ? `:${settings.obsPort || 27431}` : t('menu.obs_hint');
       }, 2000);
     }
   } catch (err) {
@@ -424,49 +431,7 @@ async function createDesktopShortcut(): Promise<void> {
 }
 
 async function triggerManualUpdateCheck(): Promise<void> {
-  if (updateBusy) return;
-  if (cachedUpdateInfo?.hasUpdate) {
-    if (cachedUpdateInfo.downloadUrl) {
-      updateBusy = true;
-      renderFooterUpdateState(t('menu.checking_short'), true);
-      closeMenu();
-      try {
-        await invoke('install_update', { info: cachedUpdateInfo });
-      } catch {
-        updateBusy = false;
-        renderFooterUpdateState();
-      }
-      return;
-    }
-    if (cachedUpdateInfo.releaseUrl) {
-      void invoke('open_release_page', { url: cachedUpdateInfo.releaseUrl });
-      closeMenu();
-      return;
-    }
-  }
-
-  updateBusy = true;
-  renderFooterUpdateState(t('menu.checking_short'), false);
-  try {
-    const info = await invoke<UpdateInfo>('check_for_update');
-    updateBusy = false;
-    if (info.hasUpdate) {
-      cachedUpdateInfo = info;
-      renderFooterUpdateState(`⬆ ${t('menu.update_ready', { ver: info.latestVersion })}`, true);
-    } else {
-      cachedUpdateInfo = info;
-      renderFooterUpdateState(`✓ v${info.currentVersion}`, false);
-      setTimeout(() => {
-        renderFooterUpdateState();
-      }, 2200);
-    }
-  } catch {
-    updateBusy = false;
-    renderFooterUpdateState('⚠ Retry', false);
-    setTimeout(() => {
-      renderFooterUpdateState();
-    }, 2200);
-  }
+  await invoke('open_release_page', { url: 'https://github.com/YujieChen8888/Shutiao/releases' });
 }
 
 async function bootstrap(): Promise<void> {
@@ -486,7 +451,7 @@ async function bootstrap(): Promise<void> {
     const tabBtn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-tab]');
     if (tabBtn) {
       const next = tabBtn.dataset.tab;
-      if (next === 'appearance' || next === 'system') {
+      if (next === 'appearance' || next === 'system' || next === 'wardrobe' || next === 'reminders') {
         switchTab(next);
       }
       return;
@@ -674,6 +639,17 @@ async function bootstrap(): Promise<void> {
   syncUI();
   renderFooterUpdateState();
   switchTab(activeTab);
+  const outfitGrid = document.getElementById('outfit-grid')!;
+  for (const outfit of OUTFITS) {
+    const btn = document.createElement('button');
+    btn.type='button';btn.className='outfit-card';btn.dataset.outfit=outfit.id;
+    btn.innerHTML='<span class=outfit-swatch></span><strong></strong><small></small>';
+    btn.querySelector<HTMLElement>('.outfit-swatch')!.style.background = `linear-gradient(135deg, ${outfit.color} 65%, ${outfit.trim} 65%)`;
+    btn.querySelector('strong')!.textContent=outfit.name;btn.querySelector('small')!.textContent=outfit.note;
+    btn.addEventListener('click',()=>void applySettingsPatch({outfitId:outfit.id}));outfitGrid.append(btn);
+  }
+  void mountReminderMenu(document.getElementById('reminders-panel')!);
+  syncUI();
   resolveInitReady();
 
   if (inTauri) {

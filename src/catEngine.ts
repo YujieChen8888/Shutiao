@@ -1,3 +1,4 @@
+import { drawOutfit2D } from './wardrobe';
 import {
   KEYBOARD_KEYS_65,
   KEYBOARD_KEYS_108,
@@ -586,6 +587,9 @@ export class KuroCatEngine {
       this.mouseBaseY = isBigFish ? 322 : 334;
     }
   }
+
+  private outfitId = "none";
+  public setOutfit(id: string): void { this.outfitId = id; }
 
   public setCatAppearance(breedId: string, skin?: CatSkinConfig | null): void {
     if (breedId !== 'dafeiyu' && this.catBreed === 'dafeiyu') {
@@ -2381,7 +2385,13 @@ export class KuroCatEngine {
     this.drawTail(ctx);
 
     // Layer 3: Exact measured spine-deformable cat silhouette (ears, cheeks, neck, pear belly, grounded hind feet, eyes & tiny whiskers)
+    const outfitNeck = this.spinePoint(0.47, breath);
+    const outfitHip = this.spinePoint(0.93, breath);
+    outfitNeck.x += purrShift; outfitHip.x += purrShift;
+    const outfitWidth = 65 * (this.customSkin?.contour.bodyChubbiness ?? 1);
+    drawOutfit2D(ctx, this.outfitId, outfitNeck, outfitHip, outfitWidth, true);
     this.drawCatBody(ctx, breath, purrShift);
+    drawOutfit2D(ctx, this.outfitId, outfitNeck, outfitHip, outfitWidth);
 
     // Layer 4: True-scale velvety cat paws (tapered idle legs / planted diagonal mouse support leg / bent curled chest paw / plump round poking paw!)
     this.drawPaw(ctx, this.leftPaw, breath);

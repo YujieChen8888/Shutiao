@@ -3,25 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KuroCat Menu</title>
+    <title>Shutiao Chen Menu</title>
   </head>
   <body class="menu-window-body">
     <div id="context-menu" class="context-menu floating-side-menu tab-menu-layout">
       <div class="menu-header-row">
-        <div class="menu-header" id="menu-header">🐈‍⬛ KuroCat 小黑猫</div>
+        <div class="menu-header" id="menu-header">🍟 陈薯条 · Shutiao Chen</div>
         <button class="menu-close-btn" id="btn-close-menu" type="button" data-i18n-title="menu.close_title" title="关闭菜单 (Esc)">×</button>
       </div>
 
       <div class="menu-tabs" role="tablist" aria-label="Settings">
-        <button class="menu-tab-btn active" data-tab="appearance" data-i18n="menu.tab_appearance" type="button" role="tab" aria-selected="true">
-          🐱 外观与互动
+        <button class="menu-tab-btn active" data-tab="appearance"  type="button" role="tab" aria-selected="true">
+          外观
         </button>
-        <button class="menu-tab-btn" data-tab="system" data-i18n="menu.tab_system" type="button" role="tab" aria-selected="false">
-          ⚙️ 键盘·OBS·系统
+        <button class="menu-tab-btn" data-tab="system"  type="button" role="tab" aria-selected="false">
+          系统
         </button>
+        <button class="menu-tab-btn" data-tab="wardrobe" type="button" role="tab" aria-selected="false">衣橱</button>
+        <button class="menu-tab-btn" data-tab="reminders" type="button" role="tab" aria-selected="false">提醒</button>
       </div>
 
       <div class="tab-body" id="menu-tab-body">
+        <div class="tab-panel hidden" data-tab-panel="wardrobe"><div class="shutiao-section-title">陈薯条的衣橱</div><p class="shutiao-note">Shutiao Chen · 四套照片同款，三套新搭配。2D / 3D 都能穿。</p><div id="outfit-grid" class="outfit-grid"></div></div>
+        <div class="tab-panel hidden" data-tab-panel="reminders" id="reminders-panel"></div>
         <!-- Tab 1: Appearance & Interaction -->
         <div class="tab-panel" data-tab-panel="appearance">
           <div class="menu-scale-row">

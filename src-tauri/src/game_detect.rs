@@ -31,6 +31,7 @@ pub struct GameActivePayload {
 const EXCLUDED_EXES: &[&str] = &[
     "kurocat.exe",
     "kuro-cat-pet.exe",
+    "shutiao.exe",
     "explorer.exe",
     "searchhost.exe",
     "shellexperiencehost.exe",

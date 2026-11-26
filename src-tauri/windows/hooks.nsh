@@ -1,5 +1,5 @@
 !macro NSIS_HOOK_PREINSTALL
-  ; Fix #73 & #74: Close any running KuroCat.exe (including legacy <=v5.1.1 copies
+  ; Fix #73 & #74: Close any running Shutiao.exe (including legacy <=v5.1.1 copies
   ; running from another folder or portable path) and eliminate "Error opening file
   ; for writing" races before NSIS writes the new binary.
   IfFileExists "$INSTDIR\${MAINBINARYNAME}.exe" 0 _kurocat_kill_any_running
@@ -19,7 +19,7 @@
         Goto _kurocat_wait_writable
 
   _kurocat_kill_any_running:
-    ; Silently close any lingering KuroCat.exe across all directories so first-time
+    ; Silently close any lingering Shutiao.exe across all directories so first-time
     ; installs never leave a legacy portable/other-folder copy running alongside the new one.
     nsExec::ExecToStack '"$SYSDIR\taskkill.exe" /F /IM "${MAINBINARYNAME}.exe"'
     Pop $R8 ; exit code (0 = terminated at least one process, 128 = none running)
@@ -37,7 +37,7 @@
 
     _kurocat_rename_aside:
       ; Windows allows renaming a mapped/locked executable in place so NSIS can write
-      ; the brand-new KuroCat.exe cleanly even if AV or an MCP child still holds a handle.
+      ; the brand-new Shutiao.exe cleanly even if AV or an MCP child still holds a handle.
       Delete "$INSTDIR\${MAINBINARYNAME}.exe.old"
       ClearErrors
       Rename "$INSTDIR\${MAINBINARYNAME}.exe" "$INSTDIR\${MAINBINARYNAME}.exe.old"
@@ -49,5 +49,5 @@
   ; Clean up any renamed-aside previous executable if unlocked now
   Delete "$INSTDIR\${MAINBINARYNAME}.exe.old"
   ; Remove legacy <=v4.2 autostart registry value if present
-  DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "KuroCatPet"
+  DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\Run" "ShutiaoPet"
 !macroend

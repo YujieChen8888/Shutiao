@@ -1,3 +1,4 @@
+import shutiaoProfile from './assets/shutiao.json';
 export interface CatSpot {
   part: 'head' | 'body' | 'leftArm' | 'rightArm';
   x: number;
@@ -273,6 +274,7 @@ export function resolveCustomSkin(raw: CatSkinConfig): ResolvedSkin {
 }
 
 export const DEFAULT_BUILTIN_CATS: CatSkinConfig[] = [
+  shutiaoProfile as CatSkinConfig,
   {
     id: 'black',
     name: '小黑猫',

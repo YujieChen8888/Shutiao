@@ -14,6 +14,7 @@ type ObsRenderMode = '2d' | '3d';
 type ObsHeadphoneMode = 'auto' | 'on' | 'off';
 
 interface ObsAppSettings {
+  outfitId?: string;
   scale?: number;
   showKeyBubbles?: boolean;
   catBreed?: string;
@@ -101,7 +102,7 @@ let catList: CatSkinConfig[] = [...DEFAULT_BUILTIN_CATS];
 let currentSettings: ObsAppSettings = {
   scale: 1,
   showKeyBubbles: true,
-  catBreed: 'black',
+  catBreed: 'shutiao',
   keyboardLayout: '65',
   keyboardOrientation: 'cat',
   tailKeyMode: 'smart',
@@ -151,6 +152,7 @@ function syncObs3D(
     engine3d.setRenderStyle('3d');
     if (activeCat) engine3d.setCatSkin(activeCat);
     engine3d.setCollar(collar);
+  engine3d.setOutfit(currentSettings.outfitId ?? 'blue-collar');
     engine3d.setHeadphones(computeObsHeadphonesOn(activeCat));
     engine3d.setKeyboardConfig(layout, orient);
     engine3d.setTailKeyConfig(tailMode, tailIds);
@@ -213,7 +215,8 @@ function applyState(): void {
       : 'none');
 
   engine.showKeyBubbles = showBubbles;
-  engine.setCatAppearance(activeCat?.id || 'black', activeCat);
+  engine.setCatAppearance(activeCat?.id || 'shutiao', activeCat);
+  engine.setOutfit(currentSettings.outfitId ?? 'blue-collar');
   engine.setHeadphones(computeObsHeadphonesOn(activeCat));
   engine.setKeyboardConfig(layout, orient);
   engine.setTailKeyConfig(tailMode, tailIds);

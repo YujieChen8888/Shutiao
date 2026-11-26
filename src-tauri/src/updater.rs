@@ -3,9 +3,9 @@ use std::path::PathBuf;
 use std::sync::{Mutex, OnceLock};
 use tauri::{AppHandle, Emitter};
 
-const QIANYI_API_LATEST: &str = "https://qianyi.one/kurocat/releases/latest.json";
-const REPO_API_LATEST: &str = "https://api.github.com/repos/qianyiai/kurocat/releases/latest";
-const REPO_RELEASES_PAGE: &str = "https://github.com/qianyiai/kurocat/releases/latest";
+const QIANYI_API_LATEST: &str = "https://api.github.com/repos/YujieChen8888/Shutiao/releases/latest";
+const REPO_API_LATEST: &str = "https://api.github.com/repos/YujieChen8888/Shutiao/releases/latest";
+const REPO_RELEASES_PAGE: &str = "https://github.com/YujieChen8888/Shutiao/releases/latest";
 
 pub const CURRENT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -1134,7 +1134,12 @@ pub fn perform_update_install(app: &AppHandle, info: UpdateInfo) -> Result<(), S
     }
 }
 
-pub fn start_background_update_checker(app: AppHandle) {
+pub fn start_background_update_checker(_app: AppHandle) {
+    // Fork releases are installed manually until a dedicated signed updater is provided.
+}
+
+#[allow(dead_code)]
+fn legacy_background_update_checker(app: AppHandle) {
     std::thread::spawn(move || {
         // Gentle initial delay after launch so startup stays instant & quiet
         std::thread::sleep(std::time::Duration::from_secs(8));
@@ -1236,11 +1241,11 @@ mod tests {
     #[test]
     fn http_url_parser_handles_github_endpoints() {
         let (https, host, port, path) =
-            parse_http_url("https://api.github.com/repos/qianyiai/kurocat/releases/latest").unwrap();
+            parse_http_url("https://api.github.com/repos/YujieChen8888/Shutiao/releases/latest").unwrap();
         assert!(https);
         assert_eq!(host, "api.github.com");
         assert_eq!(port, 443);
-        assert_eq!(path, "/repos/qianyiai/kurocat/releases/latest");
+        assert_eq!(path, "/repos/YujieChen8888/Shutiao/releases/latest");
 
         let (https2, host2, port2, path2) =
             parse_http_url("http://127.0.0.1:8080/dl?v=1").unwrap();

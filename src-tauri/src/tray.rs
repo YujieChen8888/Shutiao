@@ -161,7 +161,7 @@ fn build_tray_menu(
         None::<&str>,
     )?;
 
-    let obs_port = if initial.obs_port == 0 { 27421 } else { initial.obs_port };
+    let obs_port = if initial.obs_port == 0 { 27431 } else { initial.obs_port };
     let obs_toggle = CheckMenuItem::with_id(
         app,
         "obs_toggle",
@@ -697,7 +697,7 @@ pub fn setup_tray(app: &AppHandle, initial: &AppSettings) -> tauri::Result<()> {
                             s.obs_hide_pet = false;
                         }
                         if s.obs_port == 0 {
-                            s.obs_port = 27421;
+                            s.obs_port = 27431;
                         }
                         crate::config::save_settings(&s);
                         (s.obs_enabled, s.obs_port, s.clone())
@@ -717,7 +717,7 @@ pub fn setup_tray(app: &AppHandle, initial: &AppSettings) -> tauri::Result<()> {
                             s.obs_enabled = true;
                         }
                         if s.obs_port == 0 {
-                            s.obs_port = 27421;
+                            s.obs_port = 27431;
                         }
                         s.obs_hide_pet = next_hide;
                         crate::config::save_settings(&s);
@@ -734,7 +734,7 @@ pub fn setup_tray(app: &AppHandle, initial: &AppSettings) -> tauri::Result<()> {
                     let (port, enabled_changed, updated) = {
                         let mut s = state.settings.lock().unwrap();
                         if s.obs_port == 0 {
-                            s.obs_port = 27421;
+                            s.obs_port = 27431;
                         }
                         let changed = !s.obs_enabled;
                         if changed {

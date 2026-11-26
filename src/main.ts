@@ -33,6 +33,7 @@ type DesktopRenderMode = '2d' | '3d';
 type HeadphoneMode = 'auto' | 'on' | 'off';
 
 interface AppSettings {
+  outfitId?: string;
   x: number | null;
   y: number | null;
   scale: number;
@@ -141,9 +142,9 @@ let settings: AppSettings = {
   showKeyBubbles: true,
   soundEnabled: true,
   autostart: false,
-  catBreed: 'black',
+  catBreed: 'shutiao',
   mcpEnabled: true,
-  mcpPort: 27420,
+  mcpPort: 27430,
   keyboardLayout: '65',
   keyboardOrientation: 'cat',
   privacyPasswordGuard: true,
@@ -336,6 +337,7 @@ function syncEngine3DState(): void {
     engine3d.setCatSkin(activeCat);
   }
   engine3d.setCollar(collar);
+  engine3d.setOutfit(settings.outfitId ?? 'blue-collar');
   engine3d.setHeadphones(shouldWearHeadphonesNow());
   engine3d.setGameActive(gameActive);
   engine3d.setKeyboardConfig(kbLayout, kbOrient);
@@ -568,7 +570,8 @@ function syncMenuUI(): void {
 
   const fpsCapNum = settings.fpsCap === 30 ? 30 : 0;
   engine.showKeyBubbles = settings.showKeyBubbles;
-  engine.setCatAppearance(activeCat?.id || 'black', activeCat);
+  engine.setCatAppearance(activeCat?.id || 'shutiao', activeCat);
+  engine.setOutfit(settings.outfitId ?? 'blue-collar');
   engine.setHeadphones(shouldWearHeadphonesNow());
   engine.setKeyboardConfig(kbLayout, kbOrient);
   engine.setTailKeyConfig(tailMode, tailIds);
@@ -1070,7 +1073,7 @@ async function bootstrap(): Promise<void> {
 
   btnToastOpenEl.addEventListener('click', (e) => {
     e.stopPropagation();
-    const url = latestUpdateInfo?.releaseUrl || 'https://github.com/qianyiai/kurocat/releases/latest';
+    const url = latestUpdateInfo?.releaseUrl || 'https://github.com/YujieChen8888/Shutiao/releases';
     void invoke('open_release_page', { url });
   });
 
@@ -1248,6 +1251,22 @@ async function bootstrap(): Promise<void> {
     engine3d?.setPrivacyMode(privacyActive);
     agentCompanion.setPrivacyMode(privacyActive);
   });
+
+  const pendingReminders: {title: string}[] = [];
+  let reminderBusy = false;
+  const showNextReminder = () => {
+    if (reminderBusy || privacyActive || !pendingReminders.length) return;
+    reminderBusy = true;
+    const item = pendingReminders.shift()!;
+    showUpdateToast(`🍟 陈薯条：${item.title}`, { kind: 'transient', autoHideMs: 20000 });
+    agentCompanion.handleEvent({kind: 'action', action: 'happy', sound: true, text: item.title, source: '陈薯条', ttlMs: 20000});
+    window.setTimeout(() => { reminderBusy = false; showNextReminder(); }, 20500);
+  };
+  await listen<{title: string}>('shutiao-reminder', ev => {
+    pendingReminders.push(ev.payload);
+    showNextReminder();
+  });
+  window.setInterval(showNextReminder, 2000);
 
   await listen<AgentCompanionEvent>('kuro-agent-event', (ev) => {
     agentCompanion.handleEvent(ev.payload);

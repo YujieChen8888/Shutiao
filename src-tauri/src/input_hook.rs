@@ -1303,7 +1303,7 @@ pub mod macos_hook {
         }
     }
 
-    const MACOS_BUNDLE_ID: &str = "com.kurocat.pet";
+    const MACOS_BUNDLE_ID: &str = "com.yujiechen.shutiao";
 
     fn current_macos_app_bundle() -> Option<std::path::PathBuf> {
         let exe = std::env::current_exe().ok()?;
@@ -2772,7 +2772,7 @@ mod tests {
         );
 
         let dev_id = "Executable=/Applications/KuroCat.app/Contents/MacOS/KuroCat\n\
-            designated => identifier \"com.kurocat.pet\" and anchor apple generic and certificate leaf[subject.OU] = \"ABCDE12345\"";
+            designated => identifier \"com.yujiechen.shutiao\" and anchor apple generic and certificate leaf[subject.OU] = \"ABCDE12345\"";
         assert_eq!(parse_macos_adhoc_cdhash(dev_id), None);
     }
 

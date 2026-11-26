@@ -1,3 +1,4 @@
+import { Wardrobe3D } from './wardrobe3d';
 import * as THREE from 'three';
 import {
   resolveCatContour,
@@ -550,6 +551,8 @@ export class KuroCatEngine3D {
   private readonly furSystem = new FurShaderSystem();
 
   private readonly catRoot = new THREE.Group();
+  private readonly wardrobe = new Wardrobe3D(this.catRoot);
+  private outfitId = "none";
   private readonly homePos = new THREE.Vector3(0.02, 0, -0.02);
   private readonly capGeoStart = createCapGeometry(0);
   private readonly capGeoEnd = createCapGeometry(1);
@@ -1903,6 +1906,7 @@ export class KuroCatEngine3D {
     this.applyContourGeometry(skin);
     const p = resolveFurPalette3D(skin, this.renderStyle);
     this.currentPalette = p;
+    this.wardrobe.set(this.outfitId, y => this.radiusAtY(y), this.lastContourKey);
     this.furSystem.applyPalette(p, skin.spots || []);
     this.desk.setAccentColors(p.accent, p.accentRight);
     this.desk.setStyle(this.renderStyle);
@@ -1941,6 +1945,12 @@ export class KuroCatEngine3D {
     if (this.currentSkin) {
       this.setCatSkin(this.currentSkin);
     }
+  }
+
+  public setOutfit(id: string): void {
+    this.outfitId = id;
+    this.wardrobe.set(id, y => this.radiusAtY(y), this.lastContourKey);
+    this.wakeRendering();
   }
 
   public setCollar(id: CollarColorId): void {
@@ -2645,6 +2655,7 @@ export class KuroCatEngine3D {
     // Deform one-piece body+head smoothly & sync headMount + optional collar!
     this.deformCatBody();
     this.placeHeadAndCollar();
+    this.wardrobe.update(this.bend);
 
     // 5b) Smooth drop-on gaming headset animation + reactive KuroCat-lime/cyan RGB earcup glow!
     const hsVal = clamp(this.sHeadset.step(this.headsetOn ? 1 : 0, dt), 0, 1.18);

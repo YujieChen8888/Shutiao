@@ -1,4 +1,5 @@
 #![recursion_limit = "256"]
+mod reminders;
 
 mod cats;
 mod config;
@@ -392,7 +393,7 @@ fn get_mcp_config() -> String {
 fn get_agent_hooks_config(state: State<'_, AppState>) -> String {
     let (port, lang) = {
         let s = state.settings.lock().unwrap();
-        (if s.mcp_port == 0 { 27420 } else { s.mcp_port }, s.language.clone())
+        (if s.mcp_port == 0 { 27430 } else { s.mcp_port }, s.language.clone())
     };
     let exe = std::env::current_exe()
         .map(|p| p.to_string_lossy().to_string())
@@ -529,6 +530,7 @@ fn get_agent_hooks_config(state: State<'_, AppState>) -> String {
 
 #[tauri::command]
 fn update_settings(app: AppHandle, state: State<'_, AppState>, mut patch: AppSettings) -> AppSettings {
+    patch.outfit_id = config::normalize_outfit(&patch.outfit_id);
     patch.scale = patch.scale.clamp(0.20, 1.50);
     let clean_breed = sanitize_cat_id(&patch.cat_breed);
     patch.cat_breed = if cat_exists(&clean_breed) {
@@ -537,10 +539,10 @@ fn update_settings(app: AppHandle, state: State<'_, AppState>, mut patch: AppSet
         "black".to_string()
     };
     if patch.mcp_port == 0 {
-        patch.mcp_port = 27420;
+        patch.mcp_port = 27430;
     }
     if patch.obs_port == 0 {
-        patch.obs_port = 27421;
+        patch.obs_port = 27431;
     }
     if !patch.obs_enabled {
         patch.obs_hide_pet = false;
@@ -798,7 +800,7 @@ async fn open_context_menu(app: AppHandle) -> Result<(), String> {
                 "menu",
                 tauri::WebviewUrl::App("menu.html".into()),
             )
-            .title("KuroCat Menu")
+            .title("Shutiao Chen Menu")
             .inner_size(lw, lh)
             .decorations(false)
             .resizable(false)
@@ -1084,10 +1086,8 @@ async fn check_for_update() -> Result<updater::UpdateInfo, String> {
 }
 
 #[tauri::command]
-async fn install_update(app: AppHandle, info: updater::UpdateInfo) -> Result<(), String> {
-    tauri::async_runtime::spawn_blocking(move || updater::perform_update_install(&app, info))
-        .await
-        .map_err(|e| format!("安装更新任务异常: {}", e))?
+async fn install_update(_app: AppHandle, _info: updater::UpdateInfo) -> Result<(), String> {
+    Err("Shutiao 使用手动更新，请前往 GitHub Releases 下载新版".into())
 }
 
 #[tauri::command]
@@ -2531,9 +2531,9 @@ static WINDOWS_SINGLE_INSTANCE_MUTEX: std::sync::atomic::AtomicUsize =
     std::sync::atomic::AtomicUsize::new(0);
 
 #[cfg(windows)]
-const WIN_SINGLE_INSTANCE_MUTEX_NAME: &str = "Local\\KuroCat.SingleInstance.Mutex";
+const WIN_SINGLE_INSTANCE_MUTEX_NAME: &str = "Local\\Shutiao.SingleInstance.Mutex";
 #[cfg(windows)]
-const WIN_SINGLE_INSTANCE_WAKE_EVENT: &str = "Local\\KuroCat.ShowExisting.Event";
+const WIN_SINGLE_INSTANCE_WAKE_EVENT: &str = "Local\\Shutiao.ShowExisting.Event";
 
 #[cfg(windows)]
 fn win_try_acquire_named_mutex(name: &str) -> Result<usize, bool> {
@@ -2885,6 +2885,7 @@ pub fn run() {
                 }
             }
 
+            reminders::start(&handle);
             tray::setup_tray(&handle, &s)?;
             input_hook::start_global_hooks(handle.clone());
             privacy::start_password_privacy_watcher(
@@ -2912,7 +2913,7 @@ pub fn run() {
 
             let http_handle = handle.clone();
             let agent_handle = handle.clone();
-            let mcp_port = if s.mcp_port == 0 { 27420 } else { s.mcp_port };
+            let mcp_port = if s.mcp_port == 0 { 27430 } else { s.mcp_port };
             mcp::start_http_mcp_server(
                 mcp_port,
                 mcp_for_setup,
@@ -2985,6 +2986,9 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            reminders::get_reminders,
+            reminders::save_reminders,
+            reminders::test_reminder,
             get_settings,
             get_resolved_locale,
             trim_idle_memory,

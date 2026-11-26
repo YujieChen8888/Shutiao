@@ -454,7 +454,7 @@ pub fn parse_hook_payload(
 }
 
 fn post_loopback_json(port: u16, path: &str, payload: &Value) -> bool {
-    let actual_port = if port == 0 { 27420 } else { port };
+    let actual_port = if port == 0 { 27430 } else { port };
     let addr = SocketAddr::from(([127, 0, 0, 1], actual_port));
     let Ok(mut stream) = TcpStream::connect_timeout(&addr, Duration::from_millis(200)) else {
         return false;
@@ -718,7 +718,8 @@ fn tool_definitions() -> Value {
             "inputSchema": {
                 "type": "object",
                 "properties": {
-                    "catBreed": { "type": "string" },
+                    "outfitId": { "type": "string", "enum": ["none", "blue-collar", "mint-vest", "oat-knit", "vampire", "sailor", "raincoat", "festive"] },
+                "catBreed": { "type": "string" },
                     "renderMode": { "type": "string", "enum": ["2d", "3d"], "description": "Visual engine mode: '2d' or '3d'." },
                     "collarColor": { "type": "string", "enum": ["none", "red", "blue", "pink", "green"], "description": "Optional 3D collar & gold bell color." },
                     "headphoneMode": { "type": "string", "enum": ["auto", "on", "off"], "description": "Gaming headset mode." },
@@ -951,6 +952,9 @@ fn execute_tool(
                 } else {
                     return err_text(&format!("Unknown catBreed '{}'.", clean));
                 }
+            }
+            if let Some(id) = args.get("outfitId").and_then(|v| v.as_str()) {
+                s.outfit_id = crate::config::normalize_outfit(id);
             }
             if let Some(scale) = args.get("scale").and_then(|v| v.as_f64()) {
                 s.scale = scale.clamp(0.20, 1.50);

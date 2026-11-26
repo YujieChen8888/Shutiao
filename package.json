@@ -1,8 +1,8 @@
 {
-  "name": "kuro-cat-pet",
-  "version": "5.1.2",
+  "name": "shutiao",
+  "version": "5.2.0",
   "private": true,
-  "description": "Adorable transparent black cat desktop typing & mouse companion for Windows and macOS",
+  "description": "薯条 · Siamese desktop companion with a wardrobe and reminders",
   "type": "module",
   "scripts": {
     "dev": "vite",

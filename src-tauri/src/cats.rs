@@ -179,6 +179,7 @@ pub fn sanitize_cat_id(raw: &str) -> String {
 
 pub fn builtin_cats() -> Vec<CatSkinConfig> {
     vec![
+        serde_json::from_str(include_str!("../../src/assets/shutiao.json")).expect("valid bundled Shutiao profile"),
         CatSkinConfig {
             id: "black".to_string(),
             name: "小黑猫".to_string(),
