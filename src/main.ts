@@ -884,6 +884,7 @@ function hideUpdateToast(restorePendingUpdate = false): void {
     window.clearTimeout(toastAutoHideTimer);
     toastAutoHideTimer = null;
   }
+  updateToastEl.classList.remove('calendar-reminder');
   const prevKind = currentToastKind;
   currentToastKind = null;
   if (restorePendingUpdate && prevKind === 'transient' && showPendingUpdateToast()) {
@@ -911,6 +912,7 @@ function showUpdateToast(
     window.clearTimeout(toastAutoHideTimer);
     toastAutoHideTimer = null;
   }
+  updateToastEl.classList.remove('calendar-reminder');
   currentToastKind = options.kind ?? 'transient';
   updateToastTextEl.textContent = text;
   btnToastInstallEl.classList.toggle('hidden', !options.showInstall);
@@ -1259,7 +1261,9 @@ async function bootstrap(): Promise<void> {
     reminderBusy = true;
     const item = pendingReminders.shift()!;
     showUpdateToast(`🍟 陈薯条：${item.title}`, { kind: 'transient', autoHideMs: 20000 });
-    agentCompanion.handleEvent({kind: 'action', action: 'happy', sound: true, text: item.title, source: '陈薯条', ttlMs: 20000});
+    updateToastEl.classList.add('calendar-reminder');
+    agentCompanion.handleEvent({kind: 'bubble'});
+    agentCompanion.handleEvent({kind: 'action', action: 'happy', sound: true});
     window.setTimeout(() => { reminderBusy = false; showNextReminder(); }, 20500);
   };
   await listen<{title: string}>('shutiao-reminder', ev => {

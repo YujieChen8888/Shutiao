@@ -1124,3 +1124,6 @@ html.win7-ulw-mode .floating-side-menu {
 .weekday-choices { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; margin-top: 6px; }
 .weekday-choices label { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .weekday-choices input { width: 14px; accent-color: #9ad7cb; }
+
+.update-toast.calendar-reminder { max-width: calc(100% - 20px); border-radius: 12px; align-items: flex-start; }
+.update-toast.calendar-reminder .update-toast-text { white-space: normal; overflow-wrap: anywhere; text-overflow: clip; line-height: 1.5; }

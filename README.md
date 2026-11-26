@@ -30,8 +30,8 @@
 
 - **macOS**：保留 Apple Silicon 与 Intel 支持，CI 构建通用版 `.dmg`。
 - **Windows 10 / 11 x64**：保留原生键鼠监听、透明置顶和托盘，CI 构建 NSIS `.exe` 安装包。
-- 两个平台共用衣橱、日历提醒与 MCP 功能；本地首先验证 macOS，Windows 构建由 GitHub Actions 验证。
-- 每次推送触发 [双平台构建](https://github.com/YujieChen8888/Shutiao/actions)，成功后可在对应任务的 Artifacts 下载。安装包为开源未公证/未商业签名版本。
+- 两个平台共用衣橱、日历提醒与 MCP 功能；已在 macOS 本地构建，Windows 尚待 CI 或 Windows 机器验证。
+- [双平台构建配置](ci/github-actions/release.yml) 已准备好。当前 GitHub 凭证缺少 `workflow` 权限，配置暂存于 `ci/github-actions/`；补充权限后移到 `.github/workflows/release.yml` 即可启用。成功后可在 [Actions](https://github.com/YujieChen8888/Shutiao/actions) 的 Artifacts 下载。安装包为开源未公证/未商业签名版本。
 
 ## 本地开发与构建
 
